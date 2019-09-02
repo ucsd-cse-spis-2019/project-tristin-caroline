@@ -16,6 +16,7 @@ for i in range(1,6):
 cam = cv2.VideoCapture(0)
 cv2.namedWindow("frame")
 img_counter = 0
+img_list = []
 
 while True:
     ret, frame = cam.read()
@@ -32,6 +33,7 @@ while True:
         # SPACE pressed
         img_name = "opencv_frame_{}.png".format(img_counter)
         cv2.imwrite(img_name, frame)
+        img_list.append(img_name)
         print("{} written!".format(img_name))
         img_counter += 1
 
@@ -39,5 +41,7 @@ cam.release()
 
 cv2.destroyAllWindows()
 
-im = Image.open("opencv_frame_0.png")
-im.show()
+for pic in img_list:
+    img_name = "opencv_frame_{}.png".format(img_counter)
+    im = Image.open(img_name)
+    im.show()
