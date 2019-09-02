@@ -1,5 +1,6 @@
 import cv2
 import numpy
+from PIL import Image
 
 def unpickle(file):
     import pickle
@@ -38,5 +39,5 @@ cam.release()
 
 cv2.destroyAllWindows()
 
-
-
+im = Image.open("opencv_frame_0.png")
+im.show()

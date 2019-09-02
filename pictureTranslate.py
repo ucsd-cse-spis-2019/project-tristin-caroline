@@ -18,7 +18,7 @@ img_counter = 0
 
 while True:
     ret, frame = cam.read()
-    cv2.imshow('frame', frame)
+    cv2.imshow("test", frame)
     if not ret:
         break
     k = cv2.waitKey(1)
