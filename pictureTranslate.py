@@ -13,6 +13,8 @@ translator = Translator()
 #face_cascade = cv2.CascadeClassifier('haarcascade_frontalface_default.xml')
 #eye_cascade = cv2.CascadeClassifier('haarcascade_eye.xml')
 iphone_cascade = cv2.CascadeClassifier('iphonexrcascade15stages.xml')
+#dollar_cascade = cv2.CascadeClassifier('usdcascade12stages.xml')
+dollarface_cascade = cv2.CascadeClassifier('usdfacecascade15stages.xml')
 
 cap = cv2.VideoCapture(0, cv2.CAP_DSHOW)
 
@@ -20,7 +22,7 @@ def labelPic(x,y,w,h,color,objectName,image):
     cv2.rectangle(image,(x,y),(x+w,y+h),color,2)
     font = cv2.FONT_HERSHEY_SIMPLEX
     cv2.putText(image, "Original Word: " + objectName, (0, 30), font, 1, (0,255,255), 3, cv2.LINE_AA)
-    dest, src = "zh-cn", "en"
+    dest, src = "ja", "en"
     transWord = translator.translate(objectName, dest, src)
     fontpath = "NotoSansCJK-Regular.ttc"     
     font = ImageFont.truetype(fontpath, 32)
@@ -49,16 +51,21 @@ def labelPic(x,y,w,h,color,objectName,image):
                 
     
     #cv2.putText(img, unicode(transWord.text, "utf-8"), (120, 300), font, 2, (0,255,0), 5, cv2.LINE_AA)
-iphones = ()
+
 while True:
     ret, img = cap.read()
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     #faces = face_cascade.detectMultiScale(gray)
-    iphones = iphone_cascade.detectMultiScale(gray,15,15)
-
+    iphones = iphone_cascade.detectMultiScale(gray,18,18)
+    #dollars = dollar_cascade.detectMultiScale(gray,25,25)
+    dollarfaces = dollarface_cascade.detectMultiScale(gray,5,5)
     for (x,y,w,h) in iphones:
         labelPic(x,y,w,h,(255,255,0),"Smartphone",img)
-        iphones = ()
+    for (x,y,w,h) in dollarfaces:
+        labelPic(x,y,w,h,(255,0,255),"Dollar",img)
+
+    #for (x,y,w,h) in dollars:
+        #labelPic(x,y,w,h,(255,0,255),"Dollar Bill",img)
         #while True:
             #key = cv2.waitKey(1) or 0xff
             #if key == ord('c'):
