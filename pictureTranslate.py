@@ -1,45 +1,69 @@
 import cv2
 import numpy as np
+import googletrans
 from googletrans import Translator
 import time
 from PIL import ImageFont, ImageDraw, Image
+from gtts import gTTS
+from io import BytesIO
+from playsound import playsound
+import os
+
 translator = Translator()
 #face_cascade = cv2.CascadeClassifier('haarcascade_frontalface_default.xml')
 #eye_cascade = cv2.CascadeClassifier('haarcascade_eye.xml')
 iphone_cascade = cv2.CascadeClassifier('iphonexrcascade15stages.xml')
 
-cap = cv2.VideoCapture(0)
+cap = cv2.VideoCapture(0, cv2.CAP_DSHOW)
 
-def labelPic(x,y,w,h,color,objectName,img):
-    cv2.rectangle(img,(x,y),(x+w,y+h),color,2)
+def labelPic(x,y,w,h,color,objectName,image):
+    cv2.rectangle(image,(x,y),(x+w,y+h),color,2)
     font = cv2.FONT_HERSHEY_SIMPLEX
-    cv2.putText(img, "Original Word: " + objectName, (0, 30), font, 1, (0,255,255), 3, cv2.LINE_AA)
-    dest, src = "ja", "en"
+    cv2.putText(image, "Original Word: " + objectName, (0, 30), font, 1, (0,255,255), 3, cv2.LINE_AA)
+    dest, src = "zh-cn", "en"
     transWord = translator.translate(objectName, dest, src)
-    fontpath = "./simsun.ttc"     
+    fontpath = "NotoSansCJK-Regular.ttc"     
     font = ImageFont.truetype(fontpath, 32)
-    img_pil = Image.fromarray(img)
+    img_pil = Image.fromarray(image)
     draw = ImageDraw.Draw(img_pil)
     draw.text((0, 420),"Translated Word: " + transWord.text, font = font, fill = (0, 255, 0))
-    img = np.array(img_pil)
-    cv2.imshow("res", img)
-    cv2.waitKey(0)
-    cv2.destroyWindow("res")
-    #cv2.putText(img, transWord.text, (120, 300), font, 2, (0,255,0), 5, cv2.LINE_AA)    
-
+    image = np.array(img_pil)
+    cv2.imshow("res", image)
+    tts = gTTS(objectName, lang = src)
+    tts.save('original.mp3')
+    tts = gTTS(transWord.text, lang = dest)
+    tts.save('translated.mp3')
+    while True:
+        key = cv2.waitKey(1) or 0xff
+        #sox_effects = ("speed", "0.5")
+        if key == ord('e'):
+            playsound("original.mp3")
+        if key == ord('t'):
+            playsound("translated.mp3")
+        if key == ord('c'):
+            os.remove("original.mp3")
+            os.remove("translated.mp3")
+            cv2.destroyWindow("res")
+            #cv2.destroyAllWindows()
+            break
+                
+    
+    #cv2.putText(img, unicode(transWord.text, "utf-8"), (120, 300), font, 2, (0,255,0), 5, cv2.LINE_AA)
+iphones = ()
 while True:
     ret, img = cap.read()
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     #faces = face_cascade.detectMultiScale(gray)
-    iphones = iphone_cascade.detectMultiScale(gray, 8, 8)
+    iphones = iphone_cascade.detectMultiScale(gray,15,15)
 
     for (x,y,w,h) in iphones:
         labelPic(x,y,w,h,(255,255,0),"Smartphone",img)
+        iphones = ()
         #while True:
             #key = cv2.waitKey(1) or 0xff
             #if key == ord('c'):
                 #break
-        #for (x,y,w,h) in faces:
+        #for (xc,y,w,h) in faces:
         #cv2.rectangle(img,(x,y),(x+w,y+h),(255,0,0),2)
         #roi_gray = gray[y:y+h, x:x+w]
         #roi_color = img[y:y+h, x:x+w]
@@ -50,3 +74,5 @@ while True:
     k = cv2.waitKey(30) & 0xff
     if k == 27:
         break
+cap.release()
+cv2.destroyAllWindows()
