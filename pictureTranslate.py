@@ -10,19 +10,21 @@ from playsound import playsound
 import os
 
 translator = Translator()
-#face_cascade = cv2.CascadeClassifier('haarcascade_frontalface_default.xml')
+face_cascade = cv2.CascadeClassifier('haarcascade_frontalface_default.xml')
 #eye_cascade = cv2.CascadeClassifier('haarcascade_eye.xml')
 iphone_cascade = cv2.CascadeClassifier('iphonexrcascade15stages.xml')
-#dollar_cascade = cv2.CascadeClassifier('usdcascade12stages.xml')
 dollarface_cascade = cv2.CascadeClassifier('usdfacecascade15stages.xml')
-
+fiver_cascade = cv2.CascadeClassifier('fivercascade15stages.xml')
+#quarter_cascade = cv2.CascadeClassifier('quarternewcascade15stages.xml')
+twenty_cascade = cv2.CascadeClassifier('twentydollarcascade15stages.xml')
+cafev_cascade = cv2.CascadeClassifier('cafevcascade15stages.xml')
 cap = cv2.VideoCapture(0, cv2.CAP_DSHOW)
 
 def labelPic(x,y,w,h,color,objectName,image):
     cv2.rectangle(image,(x,y),(x+w,y+h),color,2)
     font = cv2.FONT_HERSHEY_SIMPLEX
     cv2.putText(image, "Original Word: " + objectName, (0, 30), font, 1, (0,255,255), 3, cv2.LINE_AA)
-    dest, src = "ja", "en"
+    dest, src = "fr", "en"
     transWord = translator.translate(objectName, dest, src)
     fontpath = "NotoSansCJK-Regular.ttc"     
     font = ImageFont.truetype(fontpath, 32)
@@ -54,30 +56,28 @@ def labelPic(x,y,w,h,color,objectName,image):
 
 while True:
     ret, img = cap.read()
+    cv2.imshow('img',img)
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     #faces = face_cascade.detectMultiScale(gray)
-    iphones = iphone_cascade.detectMultiScale(gray,18,18)
-    #dollars = dollar_cascade.detectMultiScale(gray,25,25)
+    iphones = iphone_cascade.detectMultiScale(gray,12,12)
     dollarfaces = dollarface_cascade.detectMultiScale(gray,5,5)
+    fivers = fiver_cascade.detectMultiScale(gray,5,5)
+    #quarters = quarter_cascade.detectMultiScale(gray,6,6)
+    twenties = twenty_cascade.detectMultiScale(gray,5,5)
+    #cafevs = cafev_cascade.detectMultiScale(gray,5,5)
     for (x,y,w,h) in iphones:
         labelPic(x,y,w,h,(255,255,0),"Smartphone",img)
     for (x,y,w,h) in dollarfaces:
-        labelPic(x,y,w,h,(255,0,255),"Dollar",img)
+        labelPic(x,y,w,h,(255,0,255),"One Dollar",img)
+    for (x,y,w,h) in fivers:
+        labelPic(x,y,w,h,(0,255,255),"Five dollars",img)
+    #for (x,y,w,h) in quarters:
+        #labelPic(x,y,w,h,(155,205,15),"Quarter dollar",img)
+    for (x,y,w,h) in twenties:
+        labelPic(x,y,w,h,(15,205,255),"Twenty dollars",img)
+    #for (x,y,w,h) in cafevs:
+        #labelPic(x,y,w,h,(15,205,255),"Dining Hall card",img)
 
-    #for (x,y,w,h) in dollars:
-        #labelPic(x,y,w,h,(255,0,255),"Dollar Bill",img)
-        #while True:
-            #key = cv2.waitKey(1) or 0xff
-            #if key == ord('c'):
-                #break
-        #for (xc,y,w,h) in faces:
-        #cv2.rectangle(img,(x,y),(x+w,y+h),(255,0,0),2)
-        #roi_gray = gray[y:y+h, x:x+w]
-        #roi_color = img[y:y+h, x:x+w]
-        #eyes = eye_cascade.detectMultiScale(roi_gray)
-        #for (ex,ey,ew,eh) in eyes:
-        #cv2.rectangle(roi_color,(ex,ey),(ex+ew,ey+eh),(0,255,0),2)
-    cv2.imshow('img',img)
     k = cv2.waitKey(30) & 0xff
     if k == 27:
         break
